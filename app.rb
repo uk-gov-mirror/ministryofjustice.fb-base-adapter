@@ -23,3 +23,8 @@ rescue JWE::InvalidData
     { error: 'Failed to decrypt submission. Is the encryption key correct?' }
   )
 end
+
+get '/healthcheck' do
+  status 200
+  body 'healthy'
+end

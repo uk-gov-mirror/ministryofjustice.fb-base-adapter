@@ -52,4 +52,12 @@ describe '/submission' do
       expect(last_response.body).to eq(error)
     end
   end
+
+  context 'healthcheck' do
+    it 'returns 200 and healthy' do
+      get 'healthcheck'
+      expect(last_response.status).to be(200)
+      expect(last_response.body).to eq('healthy')
+    end
+  end
 end
