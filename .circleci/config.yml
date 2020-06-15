@@ -1,0 +1,71 @@
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@6.7.0
+
+jobs:
+  test:
+    working_directory: ~/circle
+    docker:
+      - image: circleci/buildpack-deps:14.04
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: test
+          command: docker-compose run --rm app bundle exec rspec
+  deploy_staging:
+    working_directory: ~/circle/git/fb-base-adapter
+    docker: &ecr_base_image
+      - image: $AWS_BUILD_IMAGE_ECR_ACCOUNT_URL
+        aws_auth:
+          aws_access_key_id: $AWS_BUILD_IMAGE_ACCESS_KEY_ID
+          aws_secret_access_key: $AWS_BUILD_IMAGE_SECRET_ACCESS_KEY
+    steps:
+      - checkout
+      - setup_remote_docker
+      - add_ssh_keys:
+          fingerprints:
+            - "7e:e7:44:be:a1:4b:4e:3c:56:65:3a:94:19:50:02:cc"
+      - run:
+          name: deploy to staging
+          command: './deploy/scripts/circle_deploy.sh $CIRCLE_SHA1 staging $KUBE_TOKEN_STAGING'
+
+workflows:
+  version: 2
+  release:
+    jobs:
+      - test
+      - aws-ecr/build-and-push-image:
+          name: push_app_image
+          dockerfile: Dockerfile
+          account-url: AWS_ECR_ACCOUNT_URL
+          region: AWS_DEFAULT_REGION
+          repo: "form-builder/formbuilder-base-adapter"
+          tag: "APP_${CIRCLE_SHA1}"
+          filters:
+            branches:
+              only:
+                - master
+                - deploy-to-staging
+      - aws-ecr/build-and-push-image:
+          name: push_worker_image
+          dockerfile: Dockerfile.worker
+          account-url: AWS_ECR_ACCOUNT_URL
+          region: AWS_DEFAULT_REGION
+          repo: "form-builder/formbuilder-base-adapter"
+          tag: "WORKER_${CIRCLE_SHA1}"
+          filters:
+            branches:
+              only:
+                - master
+                - deploy-to-staging
+      - deploy_staging:
+          requires:
+            - push_app_image
+            - push_worker_image
+            - test
+          filters:
+            branches:
+              only:
+                - master
+                - deploy-to-staging
