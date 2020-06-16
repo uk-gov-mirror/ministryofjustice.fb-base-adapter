@@ -15,8 +15,8 @@ jobs:
           command: make build
       - run:
           name: test
-          command: make spec
-  deploy_staging:
+          command: make test
+  deploy_test:
     working_directory: ~/circle/git/fb-base-adapter
     docker: &ecr_base_image
       - image: $AWS_BUILD_IMAGE_ECR_ACCOUNT_URL
@@ -30,8 +30,8 @@ jobs:
           fingerprints:
             - "7e:e7:44:be:a1:4b:4e:3c:56:65:3a:94:19:50:02:cc"
       - run:
-          name: deploy to staging
-          command: './deploy/scripts/circle_deploy.sh $CIRCLE_SHA1 staging $KUBE_TOKEN_STAGING'
+          name: deploy to test environment
+          command: './deploy/scripts/circle_deploy.sh $CIRCLE_SHA1 test $KUBE_TOKEN_TEST'
 
 workflows:
   version: 2
@@ -49,8 +49,9 @@ workflows:
             branches:
               only:
                 - master
-                - deploy-to-staging
-      - deploy_staging:
+                - deploy-to-test
+                - adjust-circleci-deployment
+      - deploy_test:
           requires:
             - push_app_image
             - test
@@ -58,4 +59,5 @@ workflows:
             branches:
               only:
                 - master
-                - deploy-to-staging
+                - deploy-to-test
+                - adjust-circleci-deployment
