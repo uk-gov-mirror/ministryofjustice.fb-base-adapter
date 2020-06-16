@@ -11,8 +11,11 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          name: build
+          command: make build
+      - run:
           name: test
-          command: docker-compose run --rm app bundle exec rspec
+          command: make spec
   deploy_staging:
     working_directory: ~/circle/git/fb-base-adapter
     docker: &ecr_base_image
