@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: formbuilder-base-adapter
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: formbuilder-base-adapter
+        appGroup: formbuilder-base-adapter
+    spec:
+      containers:
+      - name: formbuilder-base-adapter
+        image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/form-builder/formbuilder-base-adapter:{{ .Values.app_image_tag }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4567
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 4567
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+        env:
+        - name: HOST
+          value: formbuilder-base-adapter-{{ .Values.environmentName }}.apps.live-1.cloud-platform.service.justice.gov.uk
+        - name: ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: formbuilder-base-adapter-secret
+              key: ENCRYPTION_KEY
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: formbuilder-base-adapter-secret
+              key: SENTRY_DSN
