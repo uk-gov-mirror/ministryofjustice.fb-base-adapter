@@ -45,6 +45,8 @@ workflows:
           region: AWS_DEFAULT_REGION
           repo: "form-builder/formbuilder-base-adapter"
           tag: "APP_${CIRCLE_SHA1}"
+          requires:
+            - test
           filters:
             branches:
               only:
