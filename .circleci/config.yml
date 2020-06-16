@@ -47,22 +47,9 @@ workflows:
               only:
                 - master
                 - deploy-to-staging
-      - aws-ecr/build-and-push-image:
-          name: push_worker_image
-          dockerfile: Dockerfile.worker
-          account-url: AWS_ECR_ACCOUNT_URL
-          region: AWS_DEFAULT_REGION
-          repo: "form-builder/formbuilder-base-adapter"
-          tag: "WORKER_${CIRCLE_SHA1}"
-          filters:
-            branches:
-              only:
-                - master
-                - deploy-to-staging
       - deploy_staging:
           requires:
             - push_app_image
-            - push_worker_image
             - test
           filters:
             branches:
