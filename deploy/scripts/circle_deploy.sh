@@ -23,8 +23,7 @@ deploy_with_secrets() {
        --set encryption_key=$encryption_key \
        > $CONFIG_FILE
 
-  cat $CONFIG_FILE
-#  kubectl apply -f $CONFIG_FILE -n formbuilder-base-adapter-$environment_name
+  kubectl apply -f $CONFIG_FILE -n formbuilder-base-adapter-$environment_name
 }
 
 main() {
