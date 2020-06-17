@@ -29,10 +29,10 @@ spec:
         - name: ENCRYPTION_KEY
           valueFrom:
             secretKeyRef:
-              name: formbuilder-base-adapter-secret
+              name: fb-base-adapter-app-secrets-{{ .Values.environmentName }}
               key: ENCRYPTION_KEY
         - name: SENTRY_DSN
           valueFrom:
             secretKeyRef:
-              name: formbuilder-base-adapter-secret
+              name: fb-base-adapter-app-secrets-{{ .Values.environmentName }}
               key: SENTRY_DSN
