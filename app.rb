@@ -24,7 +24,7 @@ rescue JWE::InvalidData
   )
 end
 
-get '/healthcheck' do
+get '/health' do
   status 200
   body 'healthy'
 end
