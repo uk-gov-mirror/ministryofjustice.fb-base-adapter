@@ -31,8 +31,3 @@ spec:
             secretKeyRef:
               name: fb-base-adapter-app-secrets-{{ .Values.environmentName }}
               key: encryption_key
-        - name: SENTRY_DSN
-          valueFrom:
-            secretKeyRef:
-              name: fb-base-adapter-app-secrets-{{ .Values.environmentName }}
-              key: sentry_dsn
