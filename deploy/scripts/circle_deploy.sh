@@ -9,7 +9,7 @@ environment_name=$2
 k8s_token=$3
 
 get_secrets() {
-    GIT_SSH_COMMAND='ssh -v -i ~/.ssh/id_rsa_7ee744bea14b4e3c56653a94195002cc -o "IdentitiesOnly=yes"' git clone git@github.com:ministryofjustice/formbuilder-base-adapter-deploy.git deploy-config
+    GIT_SSH_COMMAND='ssh -v -i ~/.ssh/id_rsa_7ee744bea14b4e3c56653a94195002cc -o "IdentitiesOnly=yes"' git clone git@github.com:ministryofjustice/fb-base-adapter-deploy.git deploy-config
     echo $ENCODED_GIT_CRYPT_KEY | base64 -d > /root/circle/git_crypt.key
     cd deploy-config && git-crypt unlock /root/circle/git_crypt.key && cd -
 }
