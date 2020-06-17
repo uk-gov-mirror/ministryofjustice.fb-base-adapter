@@ -20,7 +20,7 @@ RUN bundle install --no-cache ${BUNDLE_ARGS}
 
 COPY --chown=appuser:appgroup . .
 
-ENV APP_PORT 3000
+ENV APP_PORT 4567
 EXPOSE $APP_PORT
 
 USER ${UID}
