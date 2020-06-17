@@ -43,7 +43,7 @@ workflows:
           dockerfile: Dockerfile
           account-url: AWS_ECR_ACCOUNT_URL
           region: AWS_DEFAULT_REGION
-          repo: "form-builder/formbuilder-base-adapter"
+          repo: 'formbuilder/fb-base-adapter'
           tag: "APP_${CIRCLE_SHA1}"
           requires:
             - test
