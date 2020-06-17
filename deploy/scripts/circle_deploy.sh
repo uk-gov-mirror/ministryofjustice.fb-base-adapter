@@ -7,6 +7,7 @@ CONFIG_FILE="/tmp/helm_deploy.yaml"
 git_sha_tag=$1
 environment_name=$2
 k8s_token=$3
+encryption_key=$ENCRYPTION_KEY
 
 deploy_with_secrets() {
   echo -n "$K8S_CLUSTER_CERT" | base64 -d > .kube_certificate_authority
