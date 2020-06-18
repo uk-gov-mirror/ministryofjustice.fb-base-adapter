@@ -11,9 +11,12 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          name: build
+          command: make build
+      - run:
           name: test
-          command: docker-compose run --rm app bundle exec rspec
-  deploy_staging:
+          command: make test
+  deploy_test:
     working_directory: ~/circle/git/fb-base-adapter
     docker: &ecr_base_image
       - image: $AWS_BUILD_IMAGE_ECR_ACCOUNT_URL
@@ -25,10 +28,10 @@ jobs:
       - setup_remote_docker
       - add_ssh_keys:
           fingerprints:
-            - "7e:e7:44:be:a1:4b:4e:3c:56:65:3a:94:19:50:02:cc"
+            - 'f4:ae:38:63:c0:71:e1:18:ef:44:22:29:3c:00:5a:3a'
       - run:
-          name: deploy to staging
-          command: './deploy/scripts/circle_deploy.sh $CIRCLE_SHA1 staging $KUBE_TOKEN_STAGING'
+          name: deploy to test environment
+          command: './deploy/scripts/circle_deploy.sh $CIRCLE_SHA1 test $KUBE_TOKEN_TEST'
 
 workflows:
   version: 2
@@ -40,32 +43,21 @@ workflows:
           dockerfile: Dockerfile
           account-url: AWS_ECR_ACCOUNT_URL
           region: AWS_DEFAULT_REGION
-          repo: "form-builder/formbuilder-base-adapter"
+          repo: 'formbuilder/fb-base-adapter'
           tag: "APP_${CIRCLE_SHA1}"
-          filters:
-            branches:
-              only:
-                - master
-                - deploy-to-staging
-      - aws-ecr/build-and-push-image:
-          name: push_worker_image
-          dockerfile: Dockerfile.worker
-          account-url: AWS_ECR_ACCOUNT_URL
-          region: AWS_DEFAULT_REGION
-          repo: "form-builder/formbuilder-base-adapter"
-          tag: "WORKER_${CIRCLE_SHA1}"
-          filters:
-            branches:
-              only:
-                - master
-                - deploy-to-staging
-      - deploy_staging:
           requires:
-            - push_app_image
-            - push_worker_image
             - test
           filters:
             branches:
               only:
                 - master
-                - deploy-to-staging
+                - deploy-to-test
+      - deploy_test:
+          requires:
+            - push_app_image
+            - test
+          filters:
+            branches:
+              only:
+                - master
+                - deploy-to-test

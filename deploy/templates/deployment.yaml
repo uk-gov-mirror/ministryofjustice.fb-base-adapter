@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: formbuilder-base-adapter
-        image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/form-builder/formbuilder-base-adapter:{{ .Values.app_image_tag }}
+        image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/formbuilder/fb-base-adapter:{{ .Values.app_image_tag }}
         imagePullPolicy: Always
         ports:
         - containerPort: 4567
@@ -29,10 +29,5 @@ spec:
         - name: ENCRYPTION_KEY
           valueFrom:
             secretKeyRef:
-              name: formbuilder-base-adapter-secret
-              key: ENCRYPTION_KEY
-        - name: SENTRY_DSN
-          valueFrom:
-            secretKeyRef:
-              name: formbuilder-base-adapter-secret
-              key: SENTRY_DSN
+              name: fb-base-adapter-app-secrets-{{ .Values.environmentName }}
+              key: encryption_key

@@ -53,9 +53,9 @@ describe '/submission' do
     end
   end
 
-  context 'healthcheck' do
+  context 'health check' do
     it 'returns 200 and healthy' do
-      get 'healthcheck'
+      get 'health'
       expect(last_response.status).to be(200)
       expect(last_response.body).to eq('healthy')
     end
