@@ -52,7 +52,6 @@ workflows:
               only:
                 - master
                 - deploy-to-test
-                - adjust-circleci-deployment
       - deploy_test:
           requires:
             - push_app_image
@@ -62,4 +61,3 @@ workflows:
               only:
                 - master
                 - deploy-to-test
-                - adjust-circleci-deployment
