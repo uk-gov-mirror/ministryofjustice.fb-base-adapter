@@ -4,6 +4,7 @@ require 'sinatra/json'
 require 'pry'
 require 'jwe'
 require 'securerandom'
+require 'uuid'
 
 PAYLOAD_CONTENT_FILE = 'tmp/payload_content.json'
 
@@ -37,7 +38,12 @@ get '/submission' do
 end
 
 get '/submission/:id' do
-  read_payload_file("tmp/#{params[:id]}")
+  if UUID.validate(params[:id])
+    read_payload_file("tmp/#{params[:id]}")
+  else
+    status 400
+    json({ error: 'Submission id should be a valid UUID' })
+  end
 end
 
 get '/health' do

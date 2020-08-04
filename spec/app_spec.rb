@@ -6,15 +6,16 @@ describe 'Submissions' do
   let(:payload) { "{\"foo\": \"bar\"}" }
 
   describe 'post /submission' do
-    context 'when there is a submission' do
-      let(:encryption_key) { SecureRandom.uuid[0..15] }
-      before do
-        allow(ENV).to receive(:[]).with('ENCRYPTION_KEY').and_return(encryption_key)
-      end
+    let(:encryption_key) { SecureRandom.uuid[0..15] }
 
+    before do
+      allow(ENV).to receive(:[]).with('ENCRYPTION_KEY').and_return(encryption_key)
+    end
+
+    context 'when there is a submission' do
       context 'when the encryption key is the same as the payload' do
         let(:encrypted_payload) { JWE.encrypt(payload, encryption_key, alg: 'dir') }
-        let(:filename) { 'formatron' }
+        let(:filename) { 'eec1fa01-7c37-4c85-a1c7-b1c0ce649f8c' }
 
         before do
           allow(SecureRandom).to receive(:uuid).and_return(filename)
@@ -26,10 +27,10 @@ describe 'Submissions' do
         end
 
         it 'returns resource location' do
-          expect(
-            last_response.headers
-          ).to include('Location' => '/submission/formatron')
-          get '/submission/formatron'
+          expect(last_response.headers).to include(
+            'Location' => '/submission/eec1fa01-7c37-4c85-a1c7-b1c0ce649f8c'
+          )
+          get '/submission/eec1fa01-7c37-4c85-a1c7-b1c0ce649f8c'
           expect(last_response.status).to be(200)
           expect(last_response.body).to eq(payload)
         end
@@ -67,6 +68,18 @@ describe 'Submissions' do
       it 'returns not found' do
         get '/submission'
         expect(last_response.status).to be(404)
+        expect(last_response.body).to eq(error)
+      end
+    end
+
+    context 'when try to find a submission with invalid UUID' do
+      let(:error) do
+        JSON.generate(error: 'Submission id should be a valid UUID')
+      end
+
+      it 'returns not found' do
+        get '/submission/formatron'
+        expect(last_response.status).to be(400)
         expect(last_response.body).to eq(error)
       end
     end
