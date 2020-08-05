@@ -4,7 +4,7 @@ This is used for simulating the potential JSON endpoint adapters that integrate 
 
 ## Mechanism
 
-The base adapter receives submissions adn store temporarily into a file.
+The base adapter receives submissions and stores them temporarily as files.
 This file is deleted everyday at a specific time.
 
 ## API
