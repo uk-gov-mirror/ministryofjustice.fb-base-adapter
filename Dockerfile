@@ -24,5 +24,4 @@ ENV APP_PORT 4567
 EXPOSE $APP_PORT
 
 USER ${UID}
-
-CMD APP_ENV=production bundle exec ruby app.rb -p ${APP_PORT}
+CMD ./start.sh
