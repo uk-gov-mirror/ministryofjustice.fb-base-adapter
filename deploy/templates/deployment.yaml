@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: formbuilder-base-adapter
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: formbuilder-base-adapter
