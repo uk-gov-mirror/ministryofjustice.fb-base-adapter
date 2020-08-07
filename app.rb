@@ -21,6 +21,15 @@ helpers do
       { error: 'Failed to decrypt submission. Is the encryption key correct?' }
     )
   end
+
+  def with_valid_uuid
+    if UUID.validate(params[:id])
+      yield
+    else
+      status 400
+      json({ error: 'Submission id should be a valid UUID' })
+    end
+  end
 end
 
 post '/submission' do
@@ -38,12 +47,13 @@ get '/submission' do
 end
 
 get '/submission/:id' do
-  if UUID.validate(params[:id])
+  with_valid_uuid do
     read_payload_file("tmp/#{params[:id]}")
-  else
-    status 400
-    json({ error: 'Submission id should be a valid UUID' })
   end
+end
+
+delete '/submissions' do
+  FileUtils.rm_rf(Dir['tmp/*'])
 end
 
 get '/health' do
