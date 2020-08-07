@@ -39,6 +39,12 @@ describe 'Submissions' do
           get '/submission'
           expect(last_response.body).to eq(payload)
         end
+
+        it 'deletes submission' do
+          delete '/submissions'
+          get '/submission'
+          expect(last_response.status).to be(404)
+        end
       end
 
       context 'when the encryption key is NOT the same as the payload' do
