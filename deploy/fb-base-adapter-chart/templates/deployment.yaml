@@ -1,21 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: formbuilder-base-adapter
+  name: fb-base-adapter-{{ .Values.environmentName }}
+  namespace: formbuilder-base-adapter-{{ .Values.environmentName }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: formbuilder-base-adapter
+      app: fb-base-adapter-{{ .Values.environmentName }}
   template:
     metadata:
       labels:
-        app: formbuilder-base-adapter
+        app: fb-base-adapter-{{ .Values.environmentName }}
         appGroup: formbuilder-base-adapter
     spec:
       containers:
-      - name: formbuilder-base-adapter
-        image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/formbuilder/fb-base-adapter:{{ .Values.app_image_tag }}
+      - name: fb-base-adapter-{{ .Values.environmentName }}
+        image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/formbuilder/fb-base-adapter:{{ .Values.circleSha1 }}
         imagePullPolicy: Always
         ports:
         - containerPort: 4567

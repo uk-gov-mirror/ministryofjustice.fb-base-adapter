@@ -3,7 +3,7 @@ orbs:
   aws-ecr: circleci/aws-ecr@6.7.0
 
 jobs:
-  test:
+  tests:
     working_directory: ~/circle
     docker:
       - image: circleci/buildpack-deps:14.04
@@ -16,46 +16,48 @@ jobs:
       - run:
           name: test
           command: make test
-  deploy_test:
+  build_and_deploy_to_test:
     working_directory: ~/circle/git/fb-base-adapter
-    docker: &ecr_base_image
+    docker:
       - image: $AWS_BUILD_IMAGE_ECR_ACCOUNT_URL
         aws_auth:
           aws_access_key_id: $AWS_BUILD_IMAGE_ACCESS_KEY_ID
-          aws_secret_access_key: $AWS_BUILD_IMAGE_SECRET_ACCESS_KEY
+          aws_secret_access_key:  $AWS_BUILD_IMAGE_SECRET_ACCESS_KEY
     steps:
       - checkout
       - setup_remote_docker
       - add_ssh_keys:
           fingerprints:
-            - 'f4:ae:38:63:c0:71:e1:18:ef:44:22:29:3c:00:5a:3a'
+            - "f4:ae:38:63:c0:71:e1:18:ef:44:22:29:3c:00:5a:3a"
+      - run:
+          name: Setup base environment variable
+          command: |
+            echo "export BUILD_SHA=$CIRCLE_SHA1" >> $BASH_ENV
+            echo "export SSH_FILE_FOR_SECRETS=~/.ssh/id_rsa_f4ae3863c071e118ef4422293c005a3a" >> $BASH_ENV
+      - run:
+          name: cloning deploy scripts
+          command: 'git clone git@github.com:ministryofjustice/fb-deploy.git deploy-scripts'
+      - run:
+          name: build and push docker images
+          environment:
+            ENVIRONMENT_NAME: test
+          command: './deploy-scripts/bin/build'
       - run:
           name: deploy to test environment
-          command: './deploy/scripts/circle_deploy.sh $CIRCLE_SHA1 test $KUBE_TOKEN_TEST'
+          environment:
+            APPLICATION_NAME: fb-base-adapter
+            PLATFORM_ENV: test
+            K8S_NAMESPACE: formbuilder-base-adapter-test
+          command: './deploy-scripts/bin/deploy'
 
 workflows:
   version: 2
   release:
     jobs:
-      - test
-      - aws-ecr/build-and-push-image:
-          name: push_app_image
-          dockerfile: Dockerfile
-          account-url: AWS_ECR_ACCOUNT_URL
-          region: AWS_DEFAULT_REGION
-          repo: 'formbuilder/fb-base-adapter'
-          tag: "APP_${CIRCLE_SHA1}"
+      - tests
+      - build_and_deploy_to_test:
           requires:
-            - test
-          filters:
-            branches:
-              only:
-                - master
-                - deploy-to-test
-      - deploy_test:
-          requires:
-            - push_app_image
-            - test
+            - tests
           filters:
             branches:
               only:
