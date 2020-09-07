@@ -18,7 +18,7 @@ jobs:
           command: make test
   build_and_deploy_to_test:
     working_directory: ~/circle/git/fb-base-adapter
-    docker:
+    docker: &ecr_image
       - image: $AWS_BUILD_IMAGE_ECR_ACCOUNT_URL
         aws_auth:
           aws_access_key_id: $AWS_BUILD_IMAGE_ACCESS_KEY_ID
@@ -49,6 +49,19 @@ jobs:
             PLATFORM_ENV: test
             K8S_NAMESPACE: formbuilder-base-adapter-test
           command: './deploy-scripts/bin/deploy'
+  trigger_acceptance_tests:
+    working_directory: ~/circle/git/fb-base-adapter
+    docker: *ecr_image
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "f4:ae:38:63:c0:71:e1:18:ef:44:22:29:3c:00:5a:3a"
+      - run:
+          name: cloning deploy scripts
+          command: 'git clone git@github.com:ministryofjustice/fb-deploy.git deploy-scripts'
+      - run:
+          name: "Trigger Acceptance Tests"
+          command: './deploy-scripts/bin/acceptance_tests'
 
 workflows:
   version: 2
@@ -63,3 +76,9 @@ workflows:
               only:
                 - master
                 - deploy-to-test
+      - trigger_acceptance_tests:
+          requires:
+            - build_and_deploy_to_test
+          filters:
+            branches:
+              only: master
