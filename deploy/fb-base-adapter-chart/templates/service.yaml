@@ -1,11 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: fb-base-adapter-{{ .Values.environmentName }}
-  namespace: formbuilder-base-adapter-{{ .Values.environmentName }}
+  name: formbuilder-base-adapter
   labels:
-    app: fb-base-adapter-{{ .Values.environmentName }}
-    appGroup: formbuilder-base-adapter
+    app: formbuilder-base-adapter
 spec:
   ports:
   - port: 4567
