@@ -33,12 +33,12 @@ jobs:
       - setup_remote_docker
       - add_ssh_keys:
           fingerprints:
-            - "f4:ae:38:63:c0:71:e1:18:ef:44:22:29:3c:00:5a:3a"
+            - "10:76:81:db:22:4d:03:9a:33:e8:3b:64:a7:34:0c:e2"
       - run:
           name: Setup base environment variable
           command: |
             echo "export BUILD_SHA=$CIRCLE_SHA1" >> $BASH_ENV
-            echo "export SSH_FILE_FOR_SECRETS=~/.ssh/id_rsa_f4ae3863c071e118ef4422293c005a3a" >> $BASH_ENV
+            echo "export SSH_FILE_FOR_SECRETS=~/.ssh/id_rsa_107681db224d039a33e83b64a7340ce2" >> $BASH_ENV
       - run: &deploy_scripts
           name: cloning deploy scripts
           command: 'git clone git@github.com:ministryofjustice/fb-deploy.git deploy-scripts'
